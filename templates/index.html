@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather</title>
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Weather</a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/graph">Graph</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/sensors/">Sensors</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div id="weather_wrapper">
+            <div class="weatherCard">
+                <div class="currentTemp">
+                    <span class="temp">23&deg;</span>
+                    <span class="location">Temp</span>
+                </div>
+                <div class="currentWeather">
+                    <span class="conditions">N1</span>
+                    <div class="info">
+                        <span class="humidity">1.3 %</span>
+                        <span class="carbon">10 ppm</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h2 class="text-center">One Week Weather Prediction</h2>
+        </div>
+
+        <!-- Weather Table for One Week -->
+        <div class="table-responsive mt-4">
+              <!-- Weather Table for One Week -->
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Temperature (&deg;C)</th>
+                        <th>Humidity (%)</th>
+                        <th>Carbon (ppm)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if weather_data %}
+                        {% for data in weather_data %}
+                            <tr>
+                                <td>{{ data.date }}</td>
+                                <td>{{ data.temperature }}</td>
+                                <td>{{ data.humidity }}</td>
+                                <td>{{ data.carbon }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr class="no-data-message">
+                            <td colspan="4">
+                                <strong>Notice:</strong> No data available for the past week.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 4 JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

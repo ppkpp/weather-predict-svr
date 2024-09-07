@@ -1,0 +1,30 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+.env
+venv/
+*.egg-info/
+dist/
+build/
+*.db
+*.sqlite3
+
+# Flask specific
+instance/
+*.log
+
+# Environment
+.env
+*.env
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS-specific
+.DS_Store
+Thumbs.db

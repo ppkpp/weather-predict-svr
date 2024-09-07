@@ -1,0 +1,173 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
+@import url(https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.2/css/weather-icons.min.css);
+
+body {
+    background: linear-gradient(90deg, #7474BF 10%, #348AC7 90%);
+    font-family: 'Open Sans', sans-serif;
+}
+
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.nav-link {
+    font-weight: 600;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 2rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+.canvas-container {
+    margin-top: 20px;
+}
+
+canvas {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#weather_wrapper {
+    width: 400px;
+    margin: 100px auto;
+}
+
+.weatherCard {
+    width: 400px;
+    height: 200px;
+    font-family: 'Open Sans';
+    position: relative;
+}
+
+.currentTemp {
+    width: 220px;
+    height: 200px;
+    background: rgb(41, 41, 41);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.currentWeather {
+    width: 180px;
+    height: 200px;
+    background: rgb(237, 237, 237);
+    margin: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.temp {
+    font-size: 80px;
+    text-align: center;
+    display: block;
+    font-weight: 300;
+    color: rgb(255, 255, 255);
+    padding: 20px 0 0;
+}
+
+.location {
+    color: rgb(255, 255, 255);
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 30px;
+    display: block;
+}
+
+.conditions {
+    font-family: weathericons;
+    font-size: 80px;
+    display: block;
+    padding: 20px 0 0;
+    text-align: center;
+}
+
+.info {
+    width: 180px;
+    height: 50px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: rgb(42, 178, 234);
+    font-weight: 700;
+    color: rgb(255, 255, 255);
+    text-align: center;
+}
+
+.humidity {
+    width: 50%;
+    position: absolute;
+    left: 10px;
+    word-spacing: 60px;
+    top: 3px;
+}
+
+.humidity::before {
+    display: block;
+    content: '\f04e';
+    font-family: weathericons;
+    font-size: 40px;
+    left: 6px;
+    top: -4px;
+    position: absolute;
+}
+
+.carbon {
+    width: 50%;
+    right: -10px;
+    position: absolute;
+    word-spacing: 60px;
+    top: 3px;
+}
+
+.carbon::before {
+    display: block;
+    content: '\f050';
+    font-family: weathericons;
+    font-size: 25px;
+    left: -10px;
+    position: absolute;
+    top: 5px;
+}
+  .no-data-message {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+      border-radius: 0.25rem;
+      padding: 15px;
+      font-size: 1.1rem;
+  }
+
+  .no-data-message td {
+      text-align: center;
+      font-weight: bold;
+  }
+
+.chart-container {
+    position: relative;
+    height: 400px;
+    /* Adjust the height as needed */
+    width: 100%;
+}
+
+canvas {
+    height: 100% !important;
+    width: 100% !important;
+}
