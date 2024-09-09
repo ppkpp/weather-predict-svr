@@ -38,9 +38,9 @@ sio.connect('http://localhost:8000')  # Replace with your server URL
 try:
     while True:
         # Generate random data
-        temp = round(random.uniform(15.0, 30.0), 1)  # Temperature between 15.0 and 30.0
+        temp = round(random.uniform(0.0, 50.0), 1)  # Temperature between 15.0 and 30.0
         humidity = random.randint(30, 80)  # Humidity between 30% and 80%
-        carbon = random.randint(300, 600)  # Carbon levels between 300 and 600 ppm
+        carbon = random.randint(0, 5000)  # Carbon levels between 300 and 600 ppm
         node = f'N1'  # Node identifier N1 to N10
         
         send_message(temp, humidity, carbon, node)

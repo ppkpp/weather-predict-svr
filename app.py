@@ -8,10 +8,11 @@ from datetime import datetime, timedelta
 from flask_socketio import SocketIO, send, emit
 
 app = Flask(__name__)
-
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite3"
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "db.sqlite3")
 app.config["SECRET_KEY"] = "mysecret"
-
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 admin = Admin(app)
 socketio = SocketIO(app)

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -40,6 +41,38 @@
     <div class="container mt-5">
         <h1 class="text-center mb-4">Weather Data Graphs</h1>
         
+        <div class="row mb-5 mt-5">
+          <!-- Temperature Status -->
+          <div class="col-md-4 d-flex align-items-center">
+              <div class="temperature-status">
+                  <h3>Temperature: <span id="tempValue" class="badge badge-info">-- °C</span></h3>
+                  <h4>Status: <span id="tempStatus" class="badge badge-info">Normal</span></h4>
+                  <p id="tempMessage">Temperature is within a normal range.</p>
+            
+                  
+              </div>
+          </div>
+          
+          <!-- Humidity Status -->
+          <div class="col-md-4 d-flex align-items-center">
+              <div class="humidity-status">
+                  <h3>Humidity: <span id="humidityValue" class="badge badge-success">-- %</span></h3>
+                  <h4>Status: <span id="humidityStatus" class="badge badge-success">Normal</span></h4>
+                  <p id="humidityMessage">Humidity levels are stable.</p>
+              </div>
+          </div>
+          
+          <!-- Carbon Levels Status -->
+          <div class="col-md-4 d-flex align-items-center">
+              <div class="carbon-status">
+                  <h3>Carbon: <span id="carbonValue" class="badge badge-warning">-- ppm</span></h3>
+                  <h4>Status: <span id="carbonStatus" class="badge badge-warning">Moderate</span></h4>
+                    <p id="carbonMessage">Carbon levels are within acceptable limits.</p>
+              </div>
+          </div>
+      </div>
+
+      
         <div class="row">
             <div class="col-md-12 col-lg-4 mb-4">
                 <h3>Temperature</h3>
@@ -57,6 +90,7 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/graph.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
