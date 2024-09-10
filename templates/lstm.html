@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather</title>
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <style>
+        /* Beautify the table */
+        .table {
+            font-size: 16px;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        .table thead th {
+            background-color: #007bff;
+            color: white;
+        }
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .table tbody tr:nth-child(odd) {
+            background-color: #e9ecef;
+        }
+        .table tbody td {
+            padding: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Weather</a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/graph">Graph</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/predict">Prediction</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/sensors/">Sensors</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Add Train Button -->
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card text-center shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Train Weather Prediction Model</h5>
+                        <p class="card-text">
+                            Click the button below to initiate model training using historical weather data.
+                        </p>
+                        <button id="trainButton" class="btn btn-primary btn-lg">Train Model</button>
+                        
+                        <!-- Loading Spinner -->
+                        <div id="loadingSpinner" class="mt-3" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <p>Model is being trained. Please wait...</p>
+                        </div>
+                        
+                        <!-- Success Message -->
+                        <div id="successMessage" class="alert alert-success mt-3" style="display: none;">
+                            Model training completed successfully!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4">
+            <h2 class="text-center">One Week Weather Prediction</h2>
+        </div>
+        <!-- Weather Table for One Week -->
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered table-hover" id="weatherTable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Humidity(Day)</th>
+                        <th>Humidity(Night)</th>
+                        <th>Temperature(Day)</th>
+                        <th>Temperature(Night)</th>
+                        <th>Carbon(Day)</th>
+                        <th>Carbon(Night)</th>
+                    </tr>
+                </thead>
+                <tbody id="weatherDataBody">
+                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bootstrap 4 JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+         document.getElementById('trainButton').addEventListener('click', function () {
+                // Show loading spinner and hide success message
+                document.getElementById('loadingSpinner').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+
+                // Make AJAX request to /train
+                fetch('/train')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Hide loading spinner and show success message
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        document.getElementById('successMessage').style.display = 'block';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Hide loading spinner and show error message
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        alert('An error occurred during training.');
+                    });
+            });
+        // Function to fetch prediction results
+        function fetchWeatherData() {
+            fetch('/predict_result')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('weatherDataBody');
+                    tbody.innerHTML = '';  // Clear existing content
+
+                    if (data.length > 0) {
+                        data.forEach(item => {
+                            const row = `
+                                <tr>
+                                    <td>${new Date(item.index).toLocaleDateString()}</td>
+                                    <td>${parseFloat(item.Hum1Pred).toFixed(2)}</td>
+                                    <td>${parseFloat(item.Hum2Pred).toFixed(2)}</td>
+                                    <td>${parseFloat(item.MaxTempPred).toFixed(2)}</td>
+                                    <td>${parseFloat(item.MinTempPred).toFixed(2)}</td>
+                                    <td>${parseFloat(item.carbon1).toFixed(2)}</td>
+                                    <td>${parseFloat(item.carbon2).toFixed(2)}</td>
+                                </tr>
+                            `;
+                            tbody.innerHTML += row;
+                        });
+                    } else {
+                        tbody.innerHTML = '<tr class="no-data-message"><td colspan="7"><strong>Notice:</strong> No data available for the past week.</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('weatherDataBody').innerHTML = '<tr><td colspan="7" class="text-center">Error fetching data</td></tr>';
+                });
+        }
+
+        // Fetch weather data on page load
+        document.addEventListener('DOMContentLoaded', fetchWeatherData);
+    </script>
+</body>
+</html>

@@ -6,7 +6,16 @@ from sqlalchemy import Column, Integer, Float, DateTime, String
 from datetime import datetime, timedelta
 
 from flask_socketio import SocketIO, send, emit
-
+import numpy as np
+import pandas as pd
+from pandas import read_csv
+from sklearn.preprocessing import MinMaxScaler
+from keras.models import Sequential
+from keras.layers import LSTM, Dense, Dropout
+from keras.preprocessing.sequence import TimeseriesGenerator
+import joblib
+from keras.models import load_model
+from pandas.tseries.offsets import DateOffset
 app = Flask(__name__)
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -50,6 +59,9 @@ admin.add_view(SensorView(Sensors, db.session))
 def graphs():
     return render_template('graphs.html')
 
+@app.route('/predict')
+def predcit():
+    return render_template('lstm.html')
 @app.route('/vdata')
 def vdata():
    return jsonify(weather_data)
@@ -122,6 +134,98 @@ def save_sensor_data():
     db.session.commit()
     print(content)
     return request.json
+
+
+@app.route('/train', methods=['GET'])
+def train_model():
+    # Load and preprocess static data (file path is hardcoded)
+    file_path = 'predict/weatherKZZM.csv'
+    df = read_csv(file_path, usecols=[0, 3, 4, 5, 6,7,8], engine='python')
+    df['Date'] = pd.to_datetime(df['Date'])
+    df = df.set_index("Date")
+
+    # Split the data into training and testing sets
+    train = df[:-12]  # Use all but last 12 rows for training
+
+    # Scale the data to be between 0 and 1
+    scaler = MinMaxScaler()
+    scaler.fit(train)
+    train = scaler.transform(train)
+
+    # Set dynamic input and features
+    n_input = int(len(train) * 0.3)
+    n_features = train.shape[1]
+
+    if n_input < 1:
+        n_input = 1
+
+    # Create the TimeseriesGenerator for LSTM
+    generator = TimeseriesGenerator(train, train, length=n_input, batch_size=4)
+
+    # Build the LSTM model
+    model = Sequential()
+    model.add(LSTM(200, activation="relu", input_shape=(n_input, n_features)))
+    model.add(Dropout(0.15))
+    model.add(Dense(n_features))
+    model.compile(optimizer="adam", loss="mse")
+
+    # Train the model
+    model.fit(generator, epochs=100)
+
+    # Save the trained model and scaler
+    model.save('predict/weather_prediction_model.h5')
+    joblib.dump(scaler, 'predict/scaler.save')
+
+    return jsonify({"message": "Model trained and saved successfully!"})
+
+
+@app.route('/predict_result', methods=['GET'])
+def predict_weather():
+
+    df = read_csv('predict/weatherKZZM.csv', usecols=[0, 3, 4, 5, 6,7,8], engine='python')  # Adjust the file path as needed
+    df['Date'] = pd.to_datetime(df['Date'])  # Ensure 'Date' column is in datetime format
+    df = df.set_index("Date")  # Set 'Date' as the index
+
+    # Load the scaler
+    scaler = joblib.load('predict/scaler.save')
+
+    # Split the data into training and testing sets
+    train = df[:-12]  # Use all but last 12 rows for training
+
+    # Scale the data
+    train = scaler.transform(train)
+
+    # Dynamic adjustment for LSTM model parameters
+    n_input = int(len(train) * 0.3)  # Set n_input to 30% of the length of the training data
+    n_features = train.shape[1]  # Automatically adjust to the number of features in the data
+
+    # Load the pretrained model
+    model = load_model('predict/weather_prediction_model.h5')
+
+    # Use the last sequence from training data to predict
+    batch = train[-n_input:].reshape((1, n_input, n_features))
+
+    # Generate predictions for the next 7 days
+    n_days_to_predict = 7
+    pred_list = []
+    for i in range(n_days_to_predict):
+        pred = model.predict(batch)[0]
+        pred_list.append(pred)
+        batch = np.append(batch[:, 1:, :], [[pred]], axis=1)
+
+    # Prepare future dates for the predictions
+    add_dates = [df.index[-1] + DateOffset(days=x) for x in range(1, n_days_to_predict + 1)]
+    future_dates = pd.DataFrame(index=add_dates, columns=df.columns)  # Prepare an empty DataFrame for future dates
+
+    # Inverse transform the predictions to their original scale
+    df_predict = pd.DataFrame(scaler.inverse_transform(pred_list), index=future_dates.index,
+                              columns=["Hum1Pred", "Hum2Pred", "MaxTempPred", "MinTempPred","carbon1","carbon2"])
+
+    # Convert the DataFrame to a dictionary
+    predictions_dict = df_predict.reset_index().to_dict(orient='records')
+
+    # Return the result as a JSON response
+    return jsonify(predictions_dict)
 
 if __name__ == '__main__':
     with app.app_context():
