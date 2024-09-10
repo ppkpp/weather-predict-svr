@@ -41,17 +41,28 @@ class Sensors(db.Model):
     temperature = db.Column(db.Float)
     humidity = db.Column(db.Float)
     carbon = db.Column(db.Float)
+    temperature2 = db.Column(db.Float)
+    humidity2 = db.Column(db.Float)
+    carbon2 = db.Column(db.Float)
     created_date = db.Column(db.DateTime, default=datetime.now)
     node = db.Column(db.String(80))
 
 class SensorView(ModelView):
     can_delete = False
     can_export = True
-    form_columns = ["temperature", "humidity", "carbon", "created_date", "node"]
-    column_list = ["temperature", "humidity", "carbon", "created_date", "node"]
+    form_columns = ["temperature", "humidity", "carbon","temperature2", "humidity2", "carbon2", "created_date", "node"]
+    column_list = ["temperature", "humidity", "carbon","temperature2", "humidity2", "carbon2", "created_date", "node"]
     page_size = 100
     column_searchable_list = ['created_date', 'node']
     column_default_sort = ('created_date', False)
+    column_labels = {
+        'temperature': 'Temperature(Day)',
+        'temperature2': 'Temperature(Night)',
+        'humidity': 'Humidity(Day)',
+        'humidity2': 'Humidity(Night)',
+        'carbon': 'Carbon(Day)',
+        'carbon2': 'Carbon(Night)'
+    }
 
 admin.add_view(SensorView(Sensors, db.session))
 
