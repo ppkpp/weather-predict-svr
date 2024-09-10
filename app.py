@@ -129,7 +129,7 @@ def handle_message(msg):
 def handle_custom_event(data):
     print(f'Custom event received with data: {data}')
     emit('response_event', {'response': 'This is a response to your custom event'})
-
+"""
 @app.route('/sensors', methods=['GET', 'POST'])
 def save_sensor_data():
     content = request.json
@@ -144,7 +144,52 @@ def save_sensor_data():
     db.session.add(sensor_data)
     db.session.commit()
     print(content)
-    return request.json
+    return request.json"""
+
+
+@app.route('/sensors', methods=['POST'])
+def post_sensor_data():
+    data = request.get_json()
+    current_hour = datetime.now().hour
+    
+    # Get today's date
+    today = datetime.now().date()
+    
+    # Check if a sensor entry for today already exists
+    sensor_entry = Sensors.query.filter(db.func.date(Sensors.created_date) == today).first()
+    
+    if 0 <= current_hour < 12:
+        # Insert data for day columns if it doesn't already exist
+        if sensor_entry:
+            return jsonify({'message': 'Day data already exists, skipping insert.'}), 200
+        else:
+            new_sensor = Sensors(
+                temperature=data.get('temperature', None),
+                humidity=data.get('humidity', None),
+                carbon=data.get('carbon', None),
+                created_date=datetime.now(),
+                node=data.get('node', None)
+            )
+            db.session.add(new_sensor)
+            db.session.commit()
+            return jsonify({'message': 'Day data added successfully'}), 201
+    else:
+        # Update the night columns if they haven't been updated yet
+        if sensor_entry:
+            if sensor_entry.temperature2 is not None and sensor_entry.humidity2 is not None and sensor_entry.carbon2 is not None:
+                return jsonify({'message': 'Night data already updated, skipping update.'}), 200
+            else:
+                sensor_entry.temperature2 = data.get('temperature', sensor_entry.temperature2)
+                sensor_entry.humidity2 = data.get('humidity', sensor_entry.humidity2)
+                sensor_entry.carbon2 = data.get('carbon', sensor_entry.carbon2)
+                db.session.commit()
+                return jsonify({'message': 'Night data updated successfully'}), 200
+        else:
+            return jsonify({'error': 'No corresponding day data found'}), 404
+
+    return jsonify({'error': 'Invalid request'}), 400
+
+
 
 
 @app.route('/train', methods=['GET'])
