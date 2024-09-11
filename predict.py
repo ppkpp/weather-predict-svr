@@ -53,7 +53,7 @@ df_proj = pd.concat([df, df_predict], axis=1)
 
 # Save the predicted data to a CSV file
 df_predict = df_predict.round(1)  # Round the predictions for better readability
-df_predict.to_csv('result.csv')  # Save predictions to a CSV file
+df_predict.to_csv('predict/result.csv')  # Save predictions to a CSV file
 print(df_predict)
 # Plot the predictions for the next 7 days
 plt.figure(figsize=(20, 10))
