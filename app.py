@@ -5,7 +5,6 @@ from flask_admin.contrib.sqla import ModelView
 from sqlalchemy import Column, Integer, Float, DateTime, String
 from datetime import datetime, timedelta
 
-from flask_socketio import SocketIO, send, emit
 import numpy as np
 import pandas as pd
 from pandas import read_csv
@@ -25,7 +24,6 @@ app.config["SECRET_KEY"] = "mysecret"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 admin = Admin(app)
-socketio = SocketIO(app,cors_allowed_origins = '*' , logger=True, engineio_logger=True)
 
 weather_data = [
     {"date": "2024-09-01", "temperature": 22, "humidity": 60, "carbon": 400},
@@ -121,23 +119,6 @@ def index():
     # Pass the weather_data list to the template
     return render_template('index.html', weather_data=weather_data_list)
 
-@socketio.on('connect')
-def handle_connect():
-    print('Client connected')
-    #emit('message', {'data': 'Welcome!'})
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    print('Client disconnected')
-@socketio.on('message')
-def handle_message(msg):
-    print('Message received: ' + msg)
-    send(msg, broadcast=True)  # Broadcasts the message to all connected clients
-
-@socketio.on('custom_event')
-def handle_custom_event(data):
-    print(f'Custom event received with data: {data}')
-    emit('response_event', {'response': 'This is a response to your custom event'})
 """
 @app.route('/sensors', methods=['GET', 'POST'])
 def save_sensor_data():
@@ -293,7 +274,6 @@ def predict_weather():
     return jsonify(predictions_dict)
 
 if __name__ == '__main__':
-    #with app.app_context():
-    #    db.create_all()
-    print("Running")
-    socketio.run(app, host='0.0.0.0', debug=True, port=8888)
+    with app.app_context():
+        db.create_all()
+    app.run(host='0.0.0.0', port=8888)
