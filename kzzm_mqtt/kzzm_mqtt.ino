@@ -158,7 +158,7 @@ void loop() {
   }
 
   // Display the current sensor values on the LCD
-  showMessage("Temp: " + String(f) + "*C", "Humidity: " + String(h) + "%");
+  showMessage("Temp: " + String(t) + "*C", "Humidity: " + String(h) + "%");
 
   // Check if 1 hour has passed since the last data send to HTTP server
   if (currentMillis - lastSendTime >= interval) {
