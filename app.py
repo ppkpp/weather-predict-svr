@@ -265,7 +265,7 @@ def predict_weather():
 
     # Inverse transform the predictions to their original scale
     df_predict = pd.DataFrame(scaler.inverse_transform(pred_list), index=future_dates.index,
-                              columns=columns=["Humidity(Day) Predict","Humidity(Night) Predict","Temperature(Day) Predict","Temperature(Night) Predict","Carbon(Day) Predict","Carbon(Night) Predict"])
+                              columns=columns=["Hum1Pred","Hum2Pred","MaxTempPred","MinTempPred","carbon1","carbon2"])
 
     # Convert the DataFrame to a dictionary
     predictions_dict = df_predict.reset_index().to_dict(orient='records')
