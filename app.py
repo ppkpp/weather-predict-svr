@@ -144,11 +144,13 @@ def post_sensor_data():
     
     # Get today's date
     today = datetime.now().date()
-    
+    print("***********************")    
     # Check if a sensor entry for today already exists
+    print(data)
     sensor_entry = Sensors.query.filter(db.func.date(Sensors.created_date) == today).first()
-    
+    print(sensor_entry)    
     if 0 <= current_hour < 12:
+        print("DAY")
         # Insert data for day columns if it doesn't already exist
         if sensor_entry:
             return jsonify({'message': 'Day data already exists, skipping insert.'}), 200
@@ -165,6 +167,7 @@ def post_sensor_data():
             return jsonify({'message': 'Day data added successfully'}), 201
     else:
         # Update the night columns if they haven't been updated yet
+        print("Night")
         if sensor_entry:
             if sensor_entry.temperature2 is not None and sensor_entry.humidity2 is not None and sensor_entry.carbon2 is not None:
                 return jsonify({'message': 'Night data already updated, skipping update.'}), 200
